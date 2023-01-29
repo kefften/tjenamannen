@@ -43,25 +43,27 @@ h3 {
     text-align: center;
 }
 
-/* Start Footer */
-.footer {
-    background-color: #f7f7f7;
-    color: #000;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    margin-top: 20px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.footer a {
-    color: #000;
-    font-weight: bold;
-    text-transform: uppercase;
-    text-align: center;
-}
 
 .site {
     margin-left: 25%
 
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
 }
