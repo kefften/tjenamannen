@@ -1,0 +1,26 @@
+﻿@model tjenamannen.Models.Rimmaskin
+@{
+	ViewData["Title"] = "Home Page";
+}
+
+
+@using (Html.BeginForm("GenerateBar", "Rimmaskin", FormMethod.Post))
+{
+	@Html.TextBoxFor(model => model.searchWord)
+@*
+    @Html.ValidationMessageFor(model => model.searchWord)*@
+
+	<button type="submit">Generera</button>
+}
+
+<input type="button" value="Upload Words to DB" onclick="location.href = '@Url.Action("UploadFileToDb", "Rimmaskin")'" />
+
+@{
+	if(Model != null){
+		foreach(string word in Model.returnWords){
+			<h1>@word</h1>
+		}
+        
+	}
+
+}

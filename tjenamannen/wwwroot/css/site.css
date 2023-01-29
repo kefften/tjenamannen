@@ -1,18 +1,67 @@
-html {
-  font-size: 14px;
+/* Start Headings */
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-family: sans-serif;
+    font-weight: 400;
+    line-height: 1.2;
+    color: #222;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+h1 {
+    font-size: 2.5rem;
+    color: #ff0000;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+h2 {
+    font-size: 2rem;
+    color: #00ff00;
 }
 
-body {
-  margin-bottom: 60px;
+h3 {
+    font-size: 1.5rem;
+    color: #0000ff;
+}
+
+/* Start Navbar */
+.navbar {
+    background-color: #f7f7f7;
+    color: #000;
+    border-bottom: solid 1px #eaeaea;
+    text-align: center;
+}
+
+.navbar-brand {
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+}
+
+.nav-link {
+    color: #000;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Start Footer */
+.footer {
+    background-color: #f7f7f7;
+    color: #000;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.footer a {
+    color: #000;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.site {
+    margin-left: 25%
+
 }
