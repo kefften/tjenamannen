@@ -22,36 +22,6 @@ namespace tjenamannen.Controllers
             return View();
         }
 
-        public void UploadFileToDb()
-        {
-            IEnumerable<string> dictionary = new List<string>();
-            using (StreamReader r = new StreamReader("Resources/svenska-ord.json"))
-            {
-                string json = r.ReadToEnd();
-                dictionary = JsonSerializer.Deserialize<List<string>>(json);
-            }
-            List<string> wordsToAdd = new List<string>();
-
-            foreach (string word in dictionary)
-            {
-                if (!wordsToAdd.Contains(word.ToLower()))
-                {
-                    wordsToAdd.Add(word.ToLower());
-                }
-                
-            }
-            foreach (string word2add in wordsToAdd)
-            {
-                _db.Words.Add(new Word { WordId = word2add });
-                
-            }
-            _db.SaveChanges();
-        }
-
-
-        
-
-
 
         //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         //public IActionResult Error()
