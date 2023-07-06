@@ -12,6 +12,7 @@ namespace tjenamannen.Data
         }
 
         public DbSet<Word> Words { get; set; }   
+        public DbSet<Player> Players { get; set; }   
         public DbSet<Ordklass> Ordklasser { get; set; }   
 
     }
