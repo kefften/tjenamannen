@@ -1,10 +1,8 @@
 ﻿using tjenamannen.Data;
 using Microsoft.AspNetCore.Mvc;
 using tjenamannen.Models;
-using System;
-using System.Diagnostics;
-using System.Text.Json;
-using System.IO;
+using fNbt;
+using Newtonsoft.Json;
 
 namespace tjenamannen.Controllers
 {
@@ -12,12 +10,15 @@ namespace tjenamannen.Controllers
     {
         private readonly ILogger<RimmaskinController> _logger;
         private ApplicationDbContext _db;
+		private string _logPath = @"C:\_DEV\MinecraftServer\logs\latest.log".Replace(@"\\", @"\");
+		private string _playerDatPath = @"C:\_DEV\MinecraftServer\tjenamannen\playerdata\2b888c92-58b0-4960-8a6e-741ee1efb9b8.dat".Replace(@"\\", @"\");
+		private string _playerCacheJsonPath = @"C:\_DEV\MinecraftServer\usercache.json".Replace(@"\\", @"\");
         public MinecraftController(ILogger<RimmaskinController> logger, ApplicationDbContext db)
         {
             _logger = logger;
             _db = db;
         }
-		private string ReadFileContents(string filePath)
+		private string ReadTxtFile(string filePath)
 		{
 			try
 			{
@@ -39,26 +40,88 @@ namespace tjenamannen.Controllers
 			return string.Empty; // Return an empty string if an error occurred
 		}
 
-		private Minecraft MinecraftBuilder()
+        private List<Player> GetPlayersFromLog(string filePath)
+        {
+            var players = new List<Player>();
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                var playerNames = filePath.Split("[Server thread/INFO]: ").Where(x => x.Split(' ')[1] == "joined").Select(x => x.Split(' ').FirstOrDefault()).Distinct();
+                foreach (var playerName in playerNames)
+                {
+                    players.Add(new Player { Name = playerName });
+                }
+            }
+            return players;
+        }
+
+        private List<Player> GetPlayersFromJson(string filePath)
+        {
+
+            string json = System.IO.File.ReadAllText(filePath);
+
+            var players = new List<Player>();
+            var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
+
+            foreach (var item in data)
+            {
+                players.Add(new Player
+                {
+                    Name = item["name"],
+                    Uuid = item["uuid"]
+                });
+            }
+            return players;
+        }
+
+        private string ReadBinaryFile(string playerDatPath)
+        {
+            if (!System.IO.File.Exists(playerDatPath))
+            {
+                return string.Empty;
+            }
+
+            var myFile = new NbtFile();
+            myFile.LoadFromFile(playerDatPath);
+            var myCompoundTag = myFile.RootTag;
+
+            var contentTag = myCompoundTag.Get<NbtString>("content");
+
+            if (contentTag == null)
+            {
+                return string.Empty;
+            }
+
+            return contentTag.Value;
+        }
+
+        private void RefreshPlayersInDatabase(List<Player> players)
+        {
+            foreach (var player in players)
+            {
+                if (!_db.Players.Any(p => p.Uuid == player.Uuid))
+                {
+                    _db.Players.Add(player);
+                }
+            }
+            _db.SaveChanges();
+        }
+
+        private Minecraft MinecraftBuilder()
 		{
-			string filePath = @"C:\_DEV\Minecraft Server\logs\latest.log".Replace(@"\\", @"\");
-			string fileContent = ReadFileContents(filePath);
+            //string logFile = ReadTxtFile(_logPath);
+            //string playerDatFile = ReadBinaryFile(_playerDatPath);
+            var players = GetPlayersFromJson(_playerCacheJsonPath);
 
-			var playerNames = fileContent.Split("[Server thread/INFO]: ").Where(x => x.Split(' ')[1] == "joined").Select(x => x.Split(' ').FirstOrDefault()).Distinct();
-			var players = new List<Player>();
-			
-			foreach (var playerName in playerNames) 
-			{
-				players.Add(new Player { Name = playerName });
-			}
+            RefreshPlayersInDatabase(players);
 
-			Console.WriteLine(fileContent);
+            var model = new Minecraft()
+            {
+                //Players = GetPlayersFromLog(logFile)
+                Players = players
+            };
 
-			var model = new Minecraft();
-			model.Players = players;
-
-
-			return model;
+            return model;
 		}
 
 		public IActionResult Index()
