@@ -1,0 +1,12 @@
+﻿@model tjenamannen.Models.Minecraft
+
+<div class="content">
+	<h1>Minecraft gamers</h1>
+	<ul>
+		@foreach (var player in Model.Players)
+		{
+			<li>@player.Name</li>
+		}
+	</ul>
+
+</div>
