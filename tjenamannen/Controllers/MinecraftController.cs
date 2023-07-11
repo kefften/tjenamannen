@@ -1,134 +1,136 @@
-﻿using tjenamannen.Data;
-using Microsoft.AspNetCore.Mvc;
-using tjenamannen.Models;
-using fNbt;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using fNbt;
+using Microsoft.Extensions.Caching.Memory;
+using tjenamannen.Data;
+using tjenamannen.Models;
 
 namespace tjenamannen.Controllers
 {
-    public class MinecraftController : Controller
-    {
-        private readonly ILogger<RimmaskinController> _logger;
-        private ApplicationDbContext _db;
-		private string _logPath = @"C:\_DEV\MinecraftServer\logs\latest.log".Replace(@"\\", @"\");
-		private string _playerDatPath = @"C:\_DEV\MinecraftServer\tjenamannen\playerdata\2b888c92-58b0-4960-8a6e-741ee1efb9b8.dat".Replace(@"\\", @"\");
-		private string _playerCacheJsonPath = @"C:\_DEV\MinecraftServer\usercache.json".Replace(@"\\", @"\");
-        public MinecraftController(ILogger<RimmaskinController> logger, ApplicationDbContext db)
-        {
-            _logger = logger;
-            _db = db;
-        }
-		private string ReadTxtFile(string filePath)
+	public class MinecraftController : Controller
+	{
+		private readonly ILogger<MinecraftController> _logger;
+		private readonly ApplicationDbContext _db;
+		private readonly IMemoryCache _cache;
+		private readonly string _logPath = @"C:\_DEV\Minecraft Server\logs\latest.log";
+		private readonly string _playerDatPath = @"C:\_DEV\Minecraft Server\tjenamannen\playerdata\";
+		private readonly string _playerCacheJsonPath = @"C:\_DEV\Minecraft Server\usercache.json";
+
+		public MinecraftController(ILogger<MinecraftController> logger, ApplicationDbContext db, IMemoryCache memoryCache)
+		{
+			_logger = logger;
+			_db = db;
+			_cache = memoryCache;
+		}
+
+		private string ReadTextFile(string filePath)
 		{
 			try
 			{
-				using (StreamReader reader = new StreamReader(filePath))
-				{
-					string fileContent = reader.ReadToEnd();
-					return fileContent;
-				}
+				return System.IO.File.ReadAllText(filePath);
 			}
 			catch (FileNotFoundException)
 			{
-				Console.WriteLine("File not found: " + filePath);
+				_logger.LogError("File not found: {FilePath}", filePath);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("An error occurred: " + ex.Message);
+				_logger.LogError("An error occurred: {ErrorMessage}", ex.Message);
 			}
 
-			return string.Empty; // Return an empty string if an error occurred
+			return string.Empty;
 		}
 
-        private List<Player> GetPlayersFromLog(string filePath)
-        {
-            var players = new List<Player>();
-
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                var playerNames = filePath.Split("[Server thread/INFO]: ").Where(x => x.Split(' ')[1] == "joined").Select(x => x.Split(' ').FirstOrDefault()).Distinct();
-                foreach (var playerName in playerNames)
-                {
-                    players.Add(new Player { Name = playerName });
-                }
-            }
-            return players;
-        }
-
-        private List<Player> GetPlayersFromJson(string filePath)
-        {
-
-            string json = System.IO.File.ReadAllText(filePath);
-
-            var players = new List<Player>();
-            var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
-
-            foreach (var item in data)
-            {
-                players.Add(new Player
-                {
-                    Name = item["name"],
-                    Uuid = item["uuid"]
-                });
-            }
-            return players;
-        }
-
-        private string ReadBinaryFile(string playerDatPath)
-        {
-            if (!System.IO.File.Exists(playerDatPath))
-            {
-                return string.Empty;
-            }
-
-            var myFile = new NbtFile();
-            myFile.LoadFromFile(playerDatPath);
-            var myCompoundTag = myFile.RootTag;
-
-            var contentTag = myCompoundTag.Get<NbtString>("content");
-
-            if (contentTag == null)
-            {
-                return string.Empty;
-            }
-
-            return contentTag.Value;
-        }
-
-        private void RefreshPlayersInDatabase(List<Player> players)
-        {
-            foreach (var player in players)
-            {
-                if (!_db.Players.Any(p => p.Uuid == player.Uuid))
-                {
-                    _db.Players.Add(player);
-                }
-            }
-            _db.SaveChanges();
-        }
-
-        private Minecraft MinecraftBuilder()
+		private List<Player> GetPlayersFromJson(string filePath)
 		{
-            //string logFile = ReadTxtFile(_logPath);
-            //string playerDatFile = ReadBinaryFile(_playerDatPath);
-            var players = GetPlayersFromJson(_playerCacheJsonPath);
+			if (_cache.TryGetValue("PlayersFromJson", out List<Player> players))
+			{
+				return players;
+			}
 
-            RefreshPlayersInDatabase(players);
+			try
+			{
+				string json = ReadTextFile(filePath);
 
-            var model = new Minecraft()
-            {
-                //Players = GetPlayersFromLog(logFile)
-                Players = players
-            };
+				if (!string.IsNullOrEmpty(json))
+				{
+					var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
 
-            return model;
+					players = data.Select(item => new Player
+					{
+						Name = item["name"],
+						Uuid = item["uuid"]
+					}).ToList();
+
+					var cacheOptions = new MemoryCacheEntryOptions()
+						.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
+
+					_cache.Set("PlayersFromJson", players, cacheOptions);
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("An error occurred while getting players from JSON: {ErrorMessage}", ex.Message);
+			}
+
+			return players ?? new List<Player>();
+		}
+
+		private List<NbtTag> ReadUserCacheFromDatFile(string userId)
+		{
+			string filePath = Path.Combine(_playerDatPath, $"{userId}.dat");
+
+			if (!System.IO.File.Exists(filePath))
+			{
+				return new List<NbtTag>();
+			}
+
+			try
+			{
+				var myFile = new NbtFile();
+				myFile.LoadFromFile(filePath);
+				return myFile.RootTag.Tags.ToList();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("An error occurred while reading user cache from DAT file: {ErrorMessage}", ex.Message);
+			}
+
+			return new List<NbtTag>();
+		}
+
+		private void RefreshPlayersInDatabase(List<Player> players)
+		{
+			foreach (var player in players)
+			{
+				if (!_db.Players.Any(p => p.Uuid == player.Uuid))
+				{
+					_db.Players.Add(player);
+				}
+			}
+
+			_db.SaveChanges();
+		}
+
+		private Minecraft MinecraftBuilder()
+		{
+			var players = GetPlayersFromJson(_playerCacheJsonPath);
+			var playersCache = players.Select(x => ReadUserCacheFromDatFile(x.Uuid)).ToList();
+
+			RefreshPlayersInDatabase(players);
+
+			var model = new Minecraft
+			{
+				Players = players
+			};
+
+			return model;
 		}
 
 		public IActionResult Index()
-        {
+		{
 			var model = MinecraftBuilder();
 			return View(model);
-        }
-
-    }
+		}
+	}
 }

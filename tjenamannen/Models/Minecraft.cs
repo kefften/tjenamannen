@@ -15,5 +15,12 @@ namespace tjenamannen.Models
         public string Name { get; set; }
         public int Kills { get; set; }
         public int Deaths { get; set; }
+        public List<Achievement>? Achievements { get; set; }
+    }
+
+    public class Achievement
+    {
+        [Key]
+        public string Name { get; set; }
     }
 }
