@@ -12,9 +12,9 @@ namespace tjenamannen.Controllers
 		private readonly ILogger<MinecraftController> _logger;
 		private readonly ApplicationDbContext _db;
 		private readonly IMemoryCache _cache;
-		private readonly string _logPath = @"C:\_DEV\Minecraft Server\logs\latest.log";
-		private readonly string _playerDatPath = @"C:\_DEV\Minecraft Server\tjenamannen\playerdata\";
-		private readonly string _playerCacheJsonPath = @"C:\_DEV\Minecraft Server\usercache.json";
+		private readonly string _logPath = @"C:\_DEV\MinecraftServer\logs\latest.log";
+		private readonly string _playerDatPath = @"C:\_DEV\MinecraftServer\tjenamannen\playerdata\";
+		private readonly string _playerCacheJsonPath = @"C:\_DEV\MinecraftServer\usercache.json";
 
 		public MinecraftController(ILogger<MinecraftController> logger, ApplicationDbContext db, IMemoryCache memoryCache)
 		{
