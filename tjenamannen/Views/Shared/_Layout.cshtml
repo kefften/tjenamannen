@@ -1,4 +1,6 @@
 ﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 <html lang="en">
 <head>
 	<!-- Google tag (gtag.js) -->
@@ -25,13 +27,13 @@
 
 		<ul class="navlist">
 				<li class="header-nav-item">
-				<a class="nav-text" asp-area="" asp-controller="Rimmaskin" asp-action="Index">Rimmaskin</a>
+				<a class="nav-text" asp-area="User" asp-controller="Rimmaskin" asp-action="Index">Rimmaskin</a>
 				</li>
 				<li class="header-nav-item">
-				<a class="nav-text" asp-area="" asp-controller="Minecraft" asp-action="Index">Minecraft</a>
+				<a class="nav-text" asp-area="User" asp-controller="Minecraft" asp-action="Index">Minecraft</a>
 				</li>
 			</ul>
-
+		<partial name="_LoginPartial" />
 	</header>
 
 
