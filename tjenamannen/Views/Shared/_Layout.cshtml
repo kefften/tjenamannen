@@ -22,25 +22,30 @@
 </head>
 
 <body>
-	<header class="header">
-		<h3><a class="" asp-area="" asp-controller="Rimmaskin" asp-action="Index">Tjenamannen.se</a></h3>
-
-		<ul class="navlist">
-				<li class="header-nav-item">
-				<a class="nav-text" asp-area="User" asp-controller="Rimmaskin" asp-action="Index">Rimmaskin</a>
-				</li>
-				<li class="header-nav-item">
-				<a class="nav-text" asp-area="User" asp-controller="Minecraft" asp-action="Index">Minecraft</a>
-				</li>
-
-			<partial name="_LoginPartial" />
-			</ul>
-
+	<header>
+		<div class="row">
+			<div class="col-sm-2">
+				<h3><a class="" asp-area="" asp-controller="Rimmaskin" asp-action="Index">Tjenamannen.se</a></h3>
+			</div>
+			<div class="col-sm-8">
+				<ul class="navlist">
+					<li class="header-nav-item">
+					<a class="" asp-area="User" asp-controller="Rimmaskin" asp-action="Index">Rimmaskin</a>
+					</li>
+					<li class="header-nav-item">
+					<a class="" asp-area="User" asp-controller="Minecraft" asp-action="Index">Minecraft</a>
+					</li>
+				</ul>
+			</div>
+			<div class="col-sm-2">
+				<partial name="_LoginPartial" />
+			</div>
+		</div>
 	</header>
 
 
 
-	<div class="site">
+	<div class="container content">
 
 
 		@RenderBody()

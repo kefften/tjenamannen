@@ -41,48 +41,57 @@ h3 {
         color: #C93127;
         margin-top: -10px;
     }
+.navlist-vertical{
+    float: right;
+}
+
+.navlist {
+    align-items: center;
+}
 
 .navlist li {
     display: inline;
     list-style-type: none;
     padding-right: 20px;
     padding-left: 20px;
-    height:100px;
-    float: right;
+    /*height: 100px;*/
     justify-content: center;
     align-items: center;
 }
 .header-nav-item a {
-    /*display: flex;
-    width: 276px;*/
-    padding: 0px 60px 0px 60px;
+    display: flex;
+    /*width: 276px;*/
+    padding: 0px 30px 0px 30px;
   
     border-radius: 143px;
     background: #673B90;
 }
-.header-nav-item a:hover {
-    /*display: flex;
+    .header-nav-item a:hover {
+        /*display: flex;
     width: 276px;*/
-    padding: 0px 60px 0px 60px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 143px;
-    background: black;
-}
+        padding: 0px 30px 0px 30px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 143px;
+        background: black;
+    }
 .navlist h3 {
 
-    display: inline;
+/*    display: inline;
     list-style-type: none;
-    padding-right: 20px;
+    padding-right: 20px;*/
 
 
 }
 .navlist li a {
     color: snow;
 }
-
+.li a{
+        color: black;
+}
 a {
     text-decoration: none;
+
 
 }
 .nav-text {
@@ -91,6 +100,11 @@ a {
     /*text-transform: uppercase;*/
     /*text-align: center;*/
 }
+
+.nav-text-small {
+    font-size: 20px;
+}
+
 
 .site {
     float: left;
@@ -101,9 +115,10 @@ a {
     margin-top: 2%;
 }
 .content {
-    
-    padding:5%;
-    
+    background: #F1D04A;
+    border-radius: 100px;
+    padding: 5%;
+
 }
 
 
@@ -125,7 +140,7 @@ html {
 
 body {
     background: #673B90;
-    color: #C93127;
+    color: snow;
     /* h1 */
     font-family: Jolly Lodger;
     font-size: 40px;
