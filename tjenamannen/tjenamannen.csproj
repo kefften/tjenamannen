@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\ol\**" />
+    <Content Remove="wwwroot\lib\ol\**" />
+    <EmbeddedResource Remove="wwwroot\lib\ol\**" />
+    <None Remove="wwwroot\lib\ol\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="SignInManager.cs" />
   </ItemGroup>
 
@@ -22,6 +29,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenLayers" Version="4.6.4" />
   </ItemGroup>
 
   <ItemGroup>
