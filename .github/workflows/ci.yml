@@ -55,10 +55,10 @@ jobs:
         IIS_USER: ${{ secrets.IIS_USER }}
         IIS_PASS: ${{ secrets.IIS_PASS }}
         SERVER_IP: ${{ secrets.SERVER_IP }}
-        DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
+        DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
       run: |
         # Install sshpass if not already installed
-        sudo apt-get update
+        sudo apt-get updatevars
         sudo apt-get install -y sshpass
 
         # Copy files to the remote server
