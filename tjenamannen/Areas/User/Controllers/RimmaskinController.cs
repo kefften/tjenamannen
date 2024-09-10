@@ -1,20 +1,23 @@
 ﻿using tjenamannen.Data;
 using Microsoft.AspNetCore.Mvc;
 using tjenamannen.Models;
-using System;
-using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 
-namespace tjenamannen.Controllers
+namespace tjenamannen.Areas.User.Controllers
 {
+    [Area("User")]
     public class RimmaskinController : Controller
     {
         private readonly ILogger<RimmaskinController> _logger;
-        private ApplicationDbContext _db;
-        public RimmaskinController(ILogger<RimmaskinController> logger, ApplicationDbContext db)
+        private readonly ApplicationDbContext _db;
+        private readonly IMemoryCache _cache;
+
+        public RimmaskinController(ILogger<RimmaskinController> logger, ApplicationDbContext db, IMemoryCache memoryCache)
         {
             _logger = logger;
             _db = db;
+            _cache = memoryCache;
         }
 
         public IActionResult Index()
@@ -30,7 +33,8 @@ namespace tjenamannen.Controllers
                 string json = r.ReadToEnd();
                 dictionary = JsonSerializer.Deserialize<List<string>>(json);
             }
-            List<string> wordsToAdd = new List<string>();
+
+            var wordsToAdd = new List<string>();
 
             foreach (string word in dictionary)
             {
@@ -38,17 +42,17 @@ namespace tjenamannen.Controllers
                 {
                     wordsToAdd.Add(word.ToLower());
                 }
-                
             }
+
             foreach (string word2add in wordsToAdd)
             {
                 _db.Words.Add(new Word { WordId = word2add });
-                
             }
+
             _db.SaveChanges();
         }
 
-        private string FindVowels(String inputString)
+        private string FindVowels(string inputString)
         {
             string vowelWord = string.Empty;
 
@@ -71,47 +75,31 @@ namespace tjenamannen.Controllers
         public IActionResult GenerateBar(Rimmaskin model)
         {
             string vowels = FindVowels(model.searchWord);
-            //var dictionary = new List<string> {"Menade", "Stenade", "Hejsan", "Varför", "Alltid", "Mycket"};
 
-            //string jsonData = File.ReadAllText("data.json");
-
-            //string jsonData = File.ReadAllText("data.json");
-            List<string> dictionary2send = new List<string>();
-
-           
-            //using (StreamReader r = new StreamReader("Resources/svenska-ord.json"))
-            //{
-            //    string json = r.ReadToEnd();
-            //    dictionary = JsonSerializer.Deserialize<List<string>>(json);
-            //}
-
-
-            var dictionary = _db.Words;
-
-            foreach(var word in dictionary)
+            if (!_cache.TryGetValue("DictionaryList", out List<string> dictionaryList))
             {
-                dictionary2send.Add(word.WordId);
+                dictionaryList = LoadDictionaryFromDb();
             }
 
-
-            //List<string> wordsList = returnWords.Select(s => s.WordId).ToList<string>();
- 
             var returnModel = new Rimmaskin
             {
                 searchWord = model.searchWord,
-                returnWords = dictionary2send.Where(x => FindVowels(x) == vowels).ToList()
+                returnWords = dictionaryList.Where(x => FindVowels(x) == vowels).ToList()
             };
-            //if (ModelState.IsValid)
-            //{
 
-            //}
             return View("Index", returnModel);
         }
 
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+        private List<string> LoadDictionaryFromDb()
+        {
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); // Cache expiration time (5 minutes)
+
+            var dictionaryList = _db.Words.Select(w => w.WordId).ToList();
+
+            _cache.Set("DictionaryList", dictionaryList, cacheOptions);
+
+            return dictionaryList;
+        }
     }
 }

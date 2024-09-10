@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace tjenamannen.Controllers
+namespace tjenamannen.Areas.User.Controllers
 {
     public class HomeController : Controller
     {
