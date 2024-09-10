@@ -64,5 +64,3 @@ jobs:
         # Copy files to the remote server
         sshpass -p $IIS_PASS scp -o StrictHostKeyChecking=no -r ./publish/* $IIS_USER@$SERVER_IP:$DEPLOY_DIR
 
-        # Restart IIS on the remote server
-        sshpass -p $IIS_PASS ssh -o StrictHostKeyChecking=no $IIS_USER@$SERVER_IP "iisreset /restart"
