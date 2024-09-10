@@ -35,8 +35,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build # This ensures that the deploy job runs after the build job
-    environment: serverdatan # Reference your GitHub Actions environment
+    needs: build
+    environment: serverdatan
 
     steps:
     - name: Download artifact
@@ -45,13 +45,24 @@ jobs:
         name: aspnet-build
         path: ./publish
 
+    - name: Add SSH key to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
     - name: Deploy to IIS Server
       env:
         IIS_USER: ${{ secrets.IIS_USER }}
         IIS_PASS: ${{ secrets.IIS_PASS }}
         SERVER_IP: ${{ secrets.SERVER_IP }}
-        DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }} # Directory on the server where files will be deployed
+        DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
       run: |
+        # Install sshpass if not already installed
+        sudo apt-get update
         sudo apt-get install -y sshpass
-        sshpass -p $IIS_PASS scp -r ./publish/* $IIS_USER@$SERVER_IP:$DEPLOY_DIR
-        sshpass -p $IIS_PASS ssh $IIS_USER@$SERVER_IP "iisreset /restart"
+
+        # Copy files to the remote server
+        sshpass -p $IIS_PASS scp -o StrictHostKeyChecking=no -r ./publish/* $IIS_USER@$SERVER_IP:$DEPLOY_DIR
+
+        # Restart IIS on the remote server
+        sshpass -p $IIS_PASS ssh -o StrictHostKeyChecking=no $IIS_USER@$SERVER_IP "iisreset /restart"
