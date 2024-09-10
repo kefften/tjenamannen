@@ -30,7 +30,9 @@
     <Folder Include="Controllers\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
-
+	<PropertyGroup>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	</PropertyGroup>
   <ItemGroup>
     <None Include=".github\workflows\ci.yml" />
   </ItemGroup>
