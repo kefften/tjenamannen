@@ -58,7 +58,7 @@ jobs:
         DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
       run: |
         # Install sshpass if not already installed
-        sudo apt-get updatevars
+        sudo apt-get update
         sudo apt-get install -y sshpass
 
         # Copy files to the remote server
