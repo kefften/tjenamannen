@@ -6,7 +6,6 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace tjenamannen.Areas.User.Controllers
 {
-    [Area("User")]
     public class RimmaskinController : Controller
     {
         private readonly ILogger<RimmaskinController> _logger;
