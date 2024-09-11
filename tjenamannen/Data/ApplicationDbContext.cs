@@ -1,6 +1,6 @@
 ﻿using tjenamannen.Models;
-//using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using tjenamannen.Models.Pages;
 
 namespace tjenamannen.Data
 {
@@ -13,7 +13,6 @@ namespace tjenamannen.Data
 
         public DbSet<Word> Words { get; set; }   
         public DbSet<Player> Players { get; set; }   
-        public DbSet<Ordklass> Ordklasser { get; set; }   
 
     }
 }

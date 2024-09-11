@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 using fNbt;
 using Microsoft.Extensions.Caching.Memory;
 using tjenamannen.Data;
-using tjenamannen.Models;
+using tjenamannen.Models.Pages;
 
 namespace tjenamannen.Controllers
 {
-	public class MinecraftController : Controller
+    public class MinecraftController : Controller
 	{
 		private readonly ILogger<MinecraftController> _logger;
 		private readonly ApplicationDbContext _db;

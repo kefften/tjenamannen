@@ -1,10 +1,12 @@
 using tjenamannen.Data;
 using Microsoft.EntityFrameworkCore;
+using tjenamannen.Services.Rimmaskin;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IRimmaskinService, RimmaskinService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
 ));

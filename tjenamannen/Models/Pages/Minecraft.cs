@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace tjenamannen.Models
+namespace tjenamannen.Models.Pages
 {
     public class Minecraft
     {
