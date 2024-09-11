@@ -43,9 +43,18 @@ namespace tjenamannen.Controllers
 				}
 			}
 
+            var existingWords = _db.Words;
+            foreach (var dbWord in _db.Words)
+            {
+                if (wordsToAdd.Contains(dbWord.WordId))
+                {
+					wordsToAdd.Remove(dbWord.WordId);
+                }
+            }
+
 			foreach (string word2add in wordsToAdd)
 			{
-				_db.Words.Add(new Word { WordId = word2add });
+                _db.Words.Add(new Word { WordId = word2add });
 			}
 
 			_db.SaveChanges();
